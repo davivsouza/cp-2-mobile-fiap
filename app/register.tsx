@@ -4,6 +4,7 @@ import { Alert, StyleSheet, TextInput, View } from "react-native";
 import { registerWithEmail } from "../services/auth";
 import { AuthCardLayout } from "../components/AuthCardLayout";
 import { PrimaryButton } from "../components/PrimaryButton";
+import { isValidEmail } from "../utils/validators";
 
 export default function RegisterScreen() {
   const [name, setName] = useState("");
@@ -11,11 +12,34 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState("");
 
   async function handleRegister() {
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      Alert.alert(
+        "Campos obrigatórios",
+        "Preencha nome, e-mail e senha para criar a conta.",
+      );
+      return;
+    }
+
+    if (!isValidEmail(email.trim())) {
+      Alert.alert("E-mail inválido", "Digite um e-mail válido para continuar.");
+      return;
+    }
+
+    if (password.trim().length < 6) {
+      Alert.alert("Senha inválida", "A senha deve ter no mínimo 6 caracteres.");
+      return;
+    }
+
     try {
       await registerWithEmail(email, password);
       Alert.alert("Sucesso", "Conta criada com sucesso");
     } catch (error: any) {
-      Alert.alert("Erro ao cadastrar", error.message);
+      if (error?.code === "auth/email-already-in-use") {
+        Alert.alert("Erro ao cadastrar", "Este e-mail já está em uso.");
+        return;
+      }
+
+      Alert.alert("Erro ao cadastrar", error?.message || "Não foi possível criar a conta.");
     }
   }
 

@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: "center",
+    width: "100%",
   },
   buttonDisabled: {
     opacity: 0.7,

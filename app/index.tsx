@@ -1,10 +1,24 @@
 // src/screens/LoginScreen.tsx
-import React, { useState } from "react";
 import { Link, useRouter } from "expo-router";
+import React, { useState } from "react";
 import { Alert, StyleSheet, TextInput, View } from "react-native";
-import { loginWithEmail } from "../services/auth";
 import { AuthCardLayout } from "../components/AuthCardLayout";
 import { PrimaryButton } from "../components/PrimaryButton";
+import { loginWithEmail } from "../services/auth";
+
+function getLoginErrorMessage(error: any) {
+  const code = String(error?.code || "");
+
+  if (code === "auth/invalid-email") {
+    return "E-mail inválido. Verifique e tente novamente.";
+  }
+
+  if (code === "auth/invalid-credential") {
+    return "E-mail ou senha incorretos.";
+  }
+
+  return error?.message || "Não foi possível realizar o login.";
+}
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -12,11 +26,19 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
 
   async function handleLogin() {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert(
+        "Campos obrigatórios",
+        "Preencha e-mail e senha para entrar.",
+      );
+      return;
+    }
+
     try {
       await loginWithEmail(email, password);
       router.replace("/alunos");
     } catch (error: any) {
-      Alert.alert("Erro ao entrar", error.message);
+      Alert.alert("Erro ao entrar", getLoginErrorMessage(error));
     }
   }
 
