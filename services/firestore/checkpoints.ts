@@ -4,6 +4,8 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  query,
+  where,
 } from "firebase/firestore";
 import { db } from "../../config/firebase";
 
@@ -29,10 +31,25 @@ export async function createCheckpoint(input: CreateCheckpointInput) {
 export async function listCheckpoints() {
   const snapshot = await getDocs(checkpointsCollection);
 
-  return snapshot.docs.map((item) => ({
+  return snapshot.docs.map((item): Checkpoint => ({
     id: item.id,
-    ...item.data(),
+    ...(item.data() as Omit<Checkpoint, "id">),
   }));
+}
+
+export async function getCheckpointByAlunoId(
+  alunoId: string,
+): Promise<Checkpoint | null> {
+  const q = query(checkpointsCollection, where("id_aluno", "==", alunoId));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) return null;
+
+  const first = snapshot.docs[0];
+  return {
+    id: first.id,
+    ...(first.data() as Omit<Checkpoint, "id">),
+  };
 }
 
 export async function deleteCheckpoint(checkpointId: string) {
