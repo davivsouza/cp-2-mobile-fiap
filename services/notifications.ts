@@ -57,11 +57,3 @@ export async function scheduleLocalNotification({
     trigger: null,
   });
 }
-
-export async function cancelNotification(notificationId: string) {
-  await Notifications.cancelScheduledNotificationAsync(notificationId);
-}
-
-export async function cancelAllNotifications() {
-  await Notifications.cancelAllScheduledNotificationsAsync();
-}
