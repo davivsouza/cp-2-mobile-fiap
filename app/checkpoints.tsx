@@ -1,12 +1,17 @@
+import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function CheckpointsScreen() {
+  const params = useLocalSearchParams<{ alunoId?: string | string[] }>();
+  const alunoId = Array.isArray(params.alunoId) ? params.alunoId[0] : params.alunoId;
+
   return (
     <View style={styles.container}>
       <View style={styles.card}>
         <Text style={styles.title}>Checkpoints</Text>
-        <Text style={styles.subtitle}>Template inicial da tela de checkpoints</Text>
+        <Text style={styles.subtitle}>Cadastro de notas do aluno selecionado</Text>
+        <Text style={styles.info}>Aluno ID: {alunoId || "não informado"}</Text>
       </View>
     </View>
   );
@@ -38,5 +43,10 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: "#4d607e",
+  },
+  info: {
+    marginTop: 8,
+    fontSize: 13,
+    color: "#2b5fab",
   },
 });

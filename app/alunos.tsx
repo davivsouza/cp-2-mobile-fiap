@@ -90,7 +90,17 @@ export default function AlunosScreen() {
         renderItem={({ item }: { item: Aluno }) => {
           return (
             <View style={styles.itemCard}>
-              <Text style={styles.itemName}>{item.nome}</Text>
+              <Pressable
+                style={styles.itemMainAction}
+                onPress={() =>
+                  router.push({
+                    pathname: "/checkpoints",
+                    params: { alunoId: item.id },
+                  })
+                }
+              >
+                <Text style={styles.itemName}>{item.nome}</Text>
+              </Pressable>
               <Pressable
                 onPress={() => handleDeleteAluno(item)}
                 style={styles.deleteButton}
@@ -160,6 +170,10 @@ const styles = StyleSheet.create({
     borderColor: "#d7e3f8",
     borderRadius: 12,
     padding: 14,
+  },
+  itemMainAction: {
+    flex: 1,
+    paddingRight: 12,
   },
   itemName: {
     fontSize: 16,
