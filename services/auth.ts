@@ -1,8 +1,7 @@
 // src/services/auth.ts
 import {
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
 } from "firebase/auth";
 import { auth } from "../config/firebase";
 
@@ -22,8 +21,4 @@ export async function loginWithEmail(email: string, password: string) {
     password,
   );
   return userCredential.user;
-}
-
-export async function logout() {
-  await signOut(auth);
 }
