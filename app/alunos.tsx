@@ -3,7 +3,6 @@ import React, { useCallback, useState } from "react";
 import {
   Alert,
   FlatList,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -11,6 +10,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Aluno, deleteAluno, listAlunos } from "../services/firestore/alunos";
 import { scheduleLocalNotification } from "../services/notifications";
+import { PrimaryButton } from "../components/PrimaryButton";
+import { AlunoListItem } from "../components/AlunoListItem";
 
 export default function AlunosScreen() {
   const router = useRouter();
@@ -74,12 +75,10 @@ export default function AlunosScreen() {
     <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.header}>
         <Text style={styles.title}>Alunos</Text>
-        <Pressable
-          style={styles.addButton}
+        <PrimaryButton
+          label="Adicionar aluno"
           onPress={() => router.push("/cadastro_aluno")}
-        >
-          <Text style={styles.addButtonText}>Adicionar aluno</Text>
-        </Pressable>
+        />
       </View>
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -89,25 +88,16 @@ export default function AlunosScreen() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }: { item: Aluno }) => {
           return (
-            <View style={styles.itemCard}>
-              <Pressable
-                style={styles.itemMainAction}
-                onPress={() =>
-                  router.push({
-                    pathname: "/checkpoints",
-                    params: { alunoId: item.id },
-                  })
-                }
-              >
-                <Text style={styles.itemName}>{item.nome}</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => handleDeleteAluno(item)}
-                style={styles.deleteButton}
-              >
-                <Text style={styles.deleteButtonText}>X</Text>
-              </Pressable>
-            </View>
+            <AlunoListItem
+              aluno={item}
+              onPressAluno={(aluno) =>
+                router.push({
+                  pathname: "/checkpoints",
+                  params: { alunoId: aluno.id },
+                })
+              }
+              onDeleteAluno={handleDeleteAluno}
+            />
           );
         }}
         contentContainerStyle={styles.listContent}
@@ -141,17 +131,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#24324a",
   },
-  addButton: {
-    backgroundColor: "#2b5fab",
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  addButtonText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "600",
-  },
   errorText: {
     color: "#ad2f2f",
     marginBottom: 10,
@@ -160,37 +139,6 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingBottom: 20,
     flexGrow: 1,
-  },
-  itemCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#d7e3f8",
-    borderRadius: 12,
-    padding: 14,
-  },
-  itemMainAction: {
-    flex: 1,
-    paddingRight: 12,
-  },
-  itemName: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#24324a",
-  },
-  deleteButton: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#ffe1e1",
-  },
-  deleteButtonText: {
-    color: "#a52b2b",
-    fontWeight: "700",
   },
   emptyBox: {
     flex: 1,

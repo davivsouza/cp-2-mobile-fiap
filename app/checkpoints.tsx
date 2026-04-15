@@ -1,19 +1,13 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Checkpoint,
   createCheckpoint,
   getCheckpointByAlunoId,
 } from "../services/firestore/checkpoints";
+import { PrimaryButton } from "../components/PrimaryButton";
 
 export default function CheckpointsScreen() {
   const router = useRouter();
@@ -118,9 +112,10 @@ export default function CheckpointsScreen() {
         ) : null}
 
         {!loading && !nota && !showForm ? (
-          <Pressable style={styles.button} onPress={() => setShowForm(true)}>
-            <Text style={styles.buttonText}>Cadastrar nota</Text>
-          </Pressable>
+          <PrimaryButton
+            label="Cadastrar nota"
+            onPress={() => setShowForm(true)}
+          />
         ) : null}
 
         {!loading && showForm ? (
@@ -152,9 +147,7 @@ export default function CheckpointsScreen() {
               {getMedia(Number(cp1), Number(cp2), Number(cp3)).toFixed(2)}
             </Text>
 
-            <Pressable style={styles.button} onPress={handleSave}>
-              <Text style={styles.buttonText}>Salvar</Text>
-            </Pressable>
+            <PrimaryButton label="Salvar" onPress={handleSave} />
           </View>
         ) : null}
       </View>
@@ -224,17 +217,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "700",
     color: "#2b5fab",
-  },
-  button: {
-    backgroundColor: "#2b5fab",
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: "center",
-    marginTop: 4,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "600",
   },
 });

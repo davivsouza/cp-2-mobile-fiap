@@ -1,15 +1,10 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createAluno } from "../services/firestore/alunos";
 import { scheduleLocalNotification } from "../services/notifications";
+import { PrimaryButton } from "../components/PrimaryButton";
 
 export default function CadastroAlunoScreen() {
   const router = useRouter();
@@ -60,15 +55,11 @@ export default function CadastroAlunoScreen() {
           style={styles.input}
         />
 
-        <Pressable
-          style={[styles.button, loading && styles.buttonDisabled]}
+        <PrimaryButton
+          label={loading ? "Criando..." : "Criar aluno"}
           onPress={handleCreateAluno}
           disabled={loading}
-        >
-          <Text style={styles.buttonText}>
-            {loading ? "Criando..." : "Criar aluno"}
-          </Text>
-        </Pressable>
+        />
       </View>
     </SafeAreaView>
   );
@@ -108,20 +99,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8fbff",
     borderRadius: 8,
     padding: 12,
-  },
-  button: {
-    backgroundColor: "#2b5fab",
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: "center",
-    marginTop: 4,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "600",
   },
 });
