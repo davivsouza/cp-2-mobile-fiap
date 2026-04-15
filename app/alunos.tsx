@@ -1,5 +1,5 @@
-import { useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
+import { useRouter } from "expo-router";
+import React from "react";
 import {
   Alert,
   FlatList,
@@ -8,39 +8,15 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Aluno, deleteAluno, listAlunos } from "../services/firestore/alunos";
+import { Aluno } from "../services/firestore/alunos";
 import { scheduleLocalNotification } from "../services/notifications";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { AlunoListItem } from "../components/AlunoListItem";
+import { useAlunos } from "../hooks/useAlunos";
 
 export default function AlunosScreen() {
   const router = useRouter();
-  const [alunos, setAlunos] = useState<Aluno[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  async function loadAlunos() {
-    try {
-      setLoading(true);
-      setError("");
-      const data = await listAlunos();
-      setAlunos(data);
-    } catch (err: any) {
-      const message = err?.message
-        ? `Não foi possível carregar os alunos: ${err.message}`
-        : "Não foi possível carregar os alunos.";
-      setError(message);
-      console.error("Erro ao carregar alunos:", err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useFocusEffect(
-    useCallback(() => {
-      loadAlunos();
-    }, []),
-  );
+  const { alunos, loading, error, removeAluno } = useAlunos();
 
   function handleDeleteAluno(aluno: Aluno) {
     Alert.alert("Excluir aluno", `Deseja excluir o aluno "${aluno.nome}"?`, [
@@ -50,8 +26,7 @@ export default function AlunosScreen() {
         style: "destructive",
         onPress: async () => {
           try {
-            await deleteAluno(aluno.id);
-            setAlunos((prev) => prev.filter((item) => item.id !== aluno.id));
+            await removeAluno(aluno.id);
             await scheduleLocalNotification({
               title: "Aluno removido",
               body: `"${aluno.nome}" foi excluído com sucesso.`,

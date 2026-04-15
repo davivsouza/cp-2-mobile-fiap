@@ -1,13 +1,9 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  Checkpoint,
-  createCheckpoint,
-  getCheckpointByAlunoId,
-} from "../services/firestore/checkpoints";
 import { PrimaryButton } from "../components/PrimaryButton";
+import { useCheckpoint } from "../hooks/useCheckpoint";
 
 export default function CheckpointsScreen() {
   const router = useRouter();
@@ -16,55 +12,16 @@ export default function CheckpointsScreen() {
     ? params.alunoId[0]
     : params.alunoId;
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [nota, setNota] = useState<Checkpoint | null>(null);
+  const { nota, loading, error, saveNota, getMedia } = useCheckpoint(alunoId);
   const [showForm, setShowForm] = useState(false);
   const [cp1, setCp1] = useState("");
   const [cp2, setCp2] = useState("");
   const [cp3, setCp3] = useState("");
 
-  function getMedia(n1: number, n2: number, n3: number) {
-    if (Number.isNaN(n1) || Number.isNaN(n2) || Number.isNaN(n3)) return 0;
-    return (n1 + n2 + n3) / 3;
-  }
-
-  async function loadNota() {
-    if (!alunoId) {
-      setError("Aluno não informado.");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError("");
-      const data = await getCheckpointByAlunoId(alunoId);
-      setNota(data);
-      setShowForm(!data);
-    } catch (err: any) {
-      const message = String(err?.message || "");
-      if (message.includes("Missing or insufficient permissions")) {
-        setError("Sem permissão para acessar notas no Firestore.");
-      } else {
-        setError(message || "Não foi possível carregar as notas.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadNota();
-  }, [alunoId]);
-
   async function handleSave() {
-    if (!alunoId) return;
-
     const n1 = Number(cp1);
     const n2 = Number(cp2);
     const n3 = Number(cp3);
-    const media = getMedia(n1, n2, n3);
 
     if (Number.isNaN(n1) || Number.isNaN(n2) || Number.isNaN(n3)) {
       Alert.alert("Dados inválidos", "Preencha as 3 notas corretamente.");
@@ -72,16 +29,7 @@ export default function CheckpointsScreen() {
     }
 
     try {
-      const input = {
-        id_aluno: alunoId,
-        nota_cp1: n1,
-        nota_cp2: n2,
-        nota_cp3: n3,
-        media,
-      };
-
-      const id = await createCheckpoint(input);
-      setNota({ id, ...input });
+      await saveNota(n1, n2, n3);
       setShowForm(false);
       Alert.alert("Sucesso", "Notas salvas com sucesso.");
     } catch (err: any) {
